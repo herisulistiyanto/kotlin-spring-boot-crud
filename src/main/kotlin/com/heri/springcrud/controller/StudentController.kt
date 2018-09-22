@@ -27,7 +27,7 @@ class StudentController {
     @Autowired
     lateinit var studentValidator: StudentValidator
 
-    @GetMapping(value = ["/all"])
+    @GetMapping(value = ["/all"], consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAll(): ResponseEntity<ResultVO> {
 
         val handler = object : AbstractRequestHandler() {
@@ -38,7 +38,7 @@ class StudentController {
         return handler.getResult()
     }
 
-    @GetMapping(value = ["/{id}"])
+    @GetMapping(value = ["/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getStudent(@PathVariable id: Long): ResponseEntity<ResultVO> {
         val handler = object : AbstractRequestHandler() {
             override fun processRequest(): Any? {
@@ -62,7 +62,7 @@ class StudentController {
         return handler.getResult()
     }
 
-    @DeleteMapping(value = ["/{id}"])
+    @DeleteMapping(value = ["/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun deleteStudent(@PathVariable id: Long): ResponseEntity<ResultVO> {
         if (!studentRepo.existsById(id)) throw AppException(errorMessage = "Student with id : $id not found", code = HttpStatus.NOT_FOUND)
 
@@ -76,7 +76,7 @@ class StudentController {
     }
 
     @Transactional
-    @PutMapping(value = ["/{id}"])
+    @PutMapping(value = ["/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateStudent(@PathVariable id: Long, @RequestBody @Valid student: Student): ResponseEntity<ResultVO> {
         if (!studentRepo.existsById(id)) throw AppException(errorMessage = "Student with id : $id not found", code = HttpStatus.NOT_FOUND)
 
