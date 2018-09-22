@@ -6,7 +6,7 @@ import javax.persistence.*
 @Table(name = "student")
 class Student @JvmOverloads constructor(
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "student_id", unique = true)
         val id: Long = 0,
         @Column(name = "student_name")

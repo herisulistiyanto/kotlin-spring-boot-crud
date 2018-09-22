@@ -1,5 +1,6 @@
 package com.heri.springcrud.extension
 
+import java.util.HashMap
 import java.util.regex.Pattern
 
 val EMAIL_ADDRESS = Pattern.compile(
@@ -13,6 +14,12 @@ val EMAIL_ADDRESS = Pattern.compile(
 )
 
 val PERSON_NAME = Pattern.compile("^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*\$")
+
+object PageParam {
+    const val LIST_DATA = "PageParam.LIST_DATA"
+    const val TOTAL_ELEMENT = "PageParam.TOTAL_ELEMENT"
+    const val TOTAL_PAGES = "PageParam.TOTAL_PAGES"
+}
 
 fun String.isEmail(): Boolean {
     return EMAIL_ADDRESS.matcher(this).matches()
@@ -30,4 +37,12 @@ fun String.isNumeric(): Boolean {
 
 fun String.isNameFormat(): Boolean {
     return PERSON_NAME.matcher(this).matches()
+}
+
+fun<T> MutableList<T>.constructMapReturn(totalElement: Int, totalPages: Int): Map<String, Any> {
+    return HashMap<String, Any>().apply {
+        put(PageParam.LIST_DATA, this)
+        put(PageParam.TOTAL_ELEMENT, totalElement)
+        put(PageParam.TOTAL_PAGES, totalPages)
+    }
 }

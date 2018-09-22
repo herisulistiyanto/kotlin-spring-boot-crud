@@ -7,14 +7,12 @@ import com.heri.springcrud.repository.StudentRepo
 import com.heri.springcrud.validator.StudentValidator
 import com.heri.springcrud.vo.ResultVO
 import io.swagger.annotations.Api
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.config.annotation.EnableWebMvc
 import javax.validation.Valid
 
 @RestController
@@ -22,7 +20,6 @@ import javax.validation.Valid
 @Api(value = "Student API", description = "CRUD student API")
 class StudentController {
 
-    val logger = LoggerFactory.getLogger(StudentController::class.java)
 
     @Autowired
     lateinit var studentRepo: StudentRepo
@@ -30,8 +27,9 @@ class StudentController {
     @Autowired
     lateinit var studentValidator: StudentValidator
 
-    @GetMapping(value = ["/"])
+    @GetMapping(value = ["/all"])
     fun getAll(): ResponseEntity<ResultVO> {
+
         val handler = object : AbstractRequestHandler() {
             override fun processRequest(): Any? {
                 return studentRepo.findAll()
@@ -66,6 +64,8 @@ class StudentController {
 
     @DeleteMapping(value = ["/{id}"])
     fun deleteStudent(@PathVariable id: Long): ResponseEntity<ResultVO> {
+        if (!studentRepo.existsById(id)) throw AppException(errorMessage = "Student with id : $id not found", code = HttpStatus.NOT_FOUND)
+
         val handler = object : AbstractRequestHandler() {
             override fun processRequest(): Any? {
                 studentRepo.deleteById(id)
@@ -78,15 +78,16 @@ class StudentController {
     @Transactional
     @PutMapping(value = ["/{id}"])
     fun updateStudent(@PathVariable id: Long, @RequestBody @Valid student: Student): ResponseEntity<ResultVO> {
+        if (!studentRepo.existsById(id)) throw AppException(errorMessage = "Student with id : $id not found", code = HttpStatus.NOT_FOUND)
+
         val msg = studentValidator.validateStudent(student)
         if (msg.isNotEmpty()) throw AppException(errorMessage = msg, code = HttpStatus.BAD_REQUEST)
 
         val handler = object : AbstractRequestHandler() {
             override fun processRequest(): Any? {
                 val toUpdate: Student = studentRepo.findById(id).orElseThrow {
-                    AppException("Student Not Found", code = HttpStatus.NOT_FOUND)
+                    AppException("Student with id : $id not found", code = HttpStatus.NOT_FOUND)
                 }
-                logger.debug("$toUpdate")
                 toUpdate.name = student.name
                 toUpdate.email = student.email
                 return studentRepo.saveAndFlush(toUpdate)
