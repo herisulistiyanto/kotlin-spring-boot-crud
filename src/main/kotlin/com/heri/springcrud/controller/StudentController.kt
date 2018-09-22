@@ -7,6 +7,8 @@ import com.heri.springcrud.repository.StudentRepo
 import com.heri.springcrud.validator.StudentValidator
 import com.heri.springcrud.vo.ResultVO
 import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -27,6 +29,7 @@ class StudentController {
     @Autowired
     lateinit var studentValidator: StudentValidator
 
+    @ApiOperation("Get all student records")
     @GetMapping(value = ["/all"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAll(): ResponseEntity<ResultVO> {
 
@@ -38,8 +41,12 @@ class StudentController {
         return handler.getResult()
     }
 
+    @ApiOperation("Get specific student record by student id")
     @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getStudent(@PathVariable id: Long): ResponseEntity<ResultVO> {
+    fun getStudent(
+            @ApiParam("Specific Student id")
+            @PathVariable id: Long
+    ): ResponseEntity<ResultVO> {
         val handler = object : AbstractRequestHandler() {
             override fun processRequest(): Any? {
                 return studentRepo.getOne(id)
@@ -48,9 +55,13 @@ class StudentController {
         return handler.getResult()
     }
 
+    @ApiOperation("Save Student record on db")
     @Transactional
     @PostMapping(value = ["/"], consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun addStudent(@RequestBody @Valid student: Student): ResponseEntity<ResultVO> {
+    fun addStudent(
+            @ApiParam("Student object to be save on db")
+            @RequestBody @Valid student: Student
+    ): ResponseEntity<ResultVO> {
         val msg = studentValidator.validateStudent(student)
         if (msg.isNotEmpty()) throw AppException(errorMessage = msg, code = HttpStatus.BAD_REQUEST)
 
@@ -62,8 +73,12 @@ class StudentController {
         return handler.getResult()
     }
 
+    @ApiOperation("Delete Student record based by student id")
     @DeleteMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun deleteStudent(@PathVariable id: Long): ResponseEntity<ResultVO> {
+    fun deleteStudent(
+            @ApiParam("Specific Student id to be removed from db")
+            @PathVariable id: Long
+    ): ResponseEntity<ResultVO> {
         if (!studentRepo.existsById(id)) throw AppException(errorMessage = "Student with id : $id not found", code = HttpStatus.NOT_FOUND)
 
         val handler = object : AbstractRequestHandler() {
@@ -75,9 +90,14 @@ class StudentController {
         return handler.getResult()
     }
 
+    @ApiOperation("Update Student record based by student id")
     @Transactional
     @PutMapping(value = ["/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun updateStudent(@PathVariable id: Long, @RequestBody @Valid student: Student): ResponseEntity<ResultVO> {
+    fun updateStudent(
+            @ApiParam("Specific student id to be update")
+            @PathVariable id: Long,
+            @ApiParam("New Student info")
+            @RequestBody @Valid student: Student): ResponseEntity<ResultVO> {
         if (!studentRepo.existsById(id)) throw AppException(errorMessage = "Student with id : $id not found", code = HttpStatus.NOT_FOUND)
 
         val msg = studentValidator.validateStudent(student)
