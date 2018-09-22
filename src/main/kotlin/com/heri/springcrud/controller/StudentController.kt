@@ -6,6 +6,7 @@ import com.heri.springcrud.handler.AbstractRequestHandler
 import com.heri.springcrud.repository.StudentRepo
 import com.heri.springcrud.validator.StudentValidator
 import com.heri.springcrud.vo.ResultVO
+import io.swagger.annotations.Api
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -18,6 +19,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping(value = ["/api/v1/student"])
+@Api(value = "Student API", description = "CRUD student API")
 class StudentController {
 
     val logger = LoggerFactory.getLogger(StudentController::class.java)
@@ -66,7 +68,8 @@ class StudentController {
     fun deleteStudent(@PathVariable id: Long): ResponseEntity<ResultVO> {
         val handler = object : AbstractRequestHandler() {
             override fun processRequest(): Any? {
-                return studentRepo.deleteById(id)
+                studentRepo.deleteById(id)
+                return null
             }
         }
         return handler.getResult()

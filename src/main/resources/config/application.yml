@@ -1,0 +1,55 @@
+beforescript:
+  - echo DATABASE_NAME
+
+spring:
+  profiles: dev
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/${DATABASE_NAME}?createDatabaseIfNotExist=true
+    username: kotlin
+    password: password
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      connectionTestQuery: SELECT 1
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      maxLifetime: 1800000
+      maximumPoolSize: 10
+  messages:
+    basename: messages/messages
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+
+---
+
+spring:
+  datasource:
+    platform: postgres
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER_NAME}
+    password: ${DATABASE_PASSWORD}
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      connectionTestQuery: SELECT 1
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      maxLifetime: 1800000
+      maximumPoolSize: 10
+  messages:
+    basename: messages/messages
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
